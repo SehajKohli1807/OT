@@ -1,0 +1,37 @@
+clc
+clc
+clear all
+
+A=[2 3 -1 4;1 -2 6 -7];
+B=[8;-3];
+C=[2 3 4 7];
+n=size(A,2);
+m=size(A,1);
+nCm=nchoosek(n,m);
+P=nchoosek(1:n,m);
+sol=[];
+
+
+if n>=m
+    for i=1:nCm
+        X=zeros(n,1);
+        A1=A(:,P(i,:));
+        if det(A1)~=0
+            X1=inv(A1)*B;
+            if all (X1>=0)
+                X(P(i,:))=X1;
+                sol=[sol X];
+            end
+        end
+    end
+
+    if ~isempty(sol)
+        Z=C*sol;
+        [maxz indz]=max(Z);
+        fprintf('Optimal value is %f \n',maxz);
+        fprintf('\n\n');
+        disp(sol(:,indz));
+    else
+        disp('No basic feasible solution found');
+    end
+end

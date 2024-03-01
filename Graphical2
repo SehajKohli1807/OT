@@ -1,0 +1,61 @@
+clc
+clear all;
+C = [2,-1];
+A = [1,1;-2,1];
+b=[6,-9]
+
+x1 = 0:0.001:10
+x21 = (b(1)-A(1,1)*x1)/A(1,2);
+x22 = (b(2)-A(2,1)*x1)/A(2,2);
+
+x21=max(0,x21)
+x22=max(0,x22)
+
+plot(x1,x21,'b',x1,x22,'g')
+title('x1 vs x2')
+xlabel('value of x1')
+ylabel('value of x2')
+
+c1 = find(x1==0)
+c2 = find(x21==0)
+c3 = find(x22==0)
+
+const1 = [x1(:,[c1,c2]);x21(:,[c1,c2])]
+const2 = [x1(:,[c1,c3]);x22(:,[c1,c3])]
+corpt=unique([const1, const2]','rows')
+
+intpt=[]
+for i=1:size(A,1)
+    for j=i+1:size(A,1)
+        a=[A(i,:);A(j,:)];
+        B=[b(i);b(j)];
+        x=a\B
+        if x>=0
+            pt=x'
+        else
+            pt=[];
+        end
+        intpt=[intpt;pt]
+    end
+end
+
+allpt=[intpt;corpt];
+u_pt=unique(allpt,'rows');
+
+for i=1:size(A,1)
+    constraint=A(i,1)*u_pt(:,1)+A(i,2)*u_pt(:,2)-b(i);
+    NF=find(constraint>0);
+    u_pt(NF,:)=[];
+end
+
+disp(u_pt)
+FP=unique(u_pt,'rows')
+
+for i=1:size(FP,1)
+    Z(i,:)=FP(i,:)*C';
+end
+
+[opt_valmin,index]=min(Z);
+[opt_valmax,index1]=max(Z);
+opt_minpt= FP(index,:)
+opt_maxpt= FP(index1,:)

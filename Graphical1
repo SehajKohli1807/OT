@@ -1,0 +1,80 @@
+%{
+
+Max X=3x1+2x2
+subject to constraints
+
+2x1+4x2>=8
+3x1+5x2>=15
+x1,x2>=0
+%}
+
+
+
+C=[3 2];
+A=[2 4;3 5;1 0;0 1];
+B=[8;15;0;0];
+
+x1=0:max(B);
+x21=(B(1)-(A(1,1)*x1))/A(1,2);
+x22=(B(2)-(A(2,1)*x1))/A(2,2);
+
+x21=max(0,x21);
+x22=max(0,x22);
+
+plot(x1,x21,'r',x1,x22,'g');
+pt=[0;0];
+
+for i=1:size(A,1)-2
+    for j=i+1:size(A,1)
+        A1=A([i j],:);
+        B1=B([i j],:);
+        X=inv(A1)*B1;
+        pt=[pt X];
+    end
+end
+
+%pt
+pt=pt';
+fprintf("Points of Intersection")
+pt
+
+
+for i=1:size(pt,1)
+    const1(i)=A(1,1)*pt(i,1)+A(1,2)*pt(i,2)-B(1);
+    const2(i)=A(2,1)*pt(i,1)+A(2,2)*pt(i,2)-B(2);
+end
+
+fprintf("Values of constraints equations on all intersection points")
+const1
+const2
+
+s1=find(const1<0);
+s2=find(const2<0);
+
+s=unique([s1 s2]);
+pt(s,:)=[];
+
+fprintf("Points that satisfy all of the constraints")
+pt
+s3=find(pt(:,1)<0);
+s4=find(pt(:,2)<0);
+pt(s3,:)=[];
+pt(s4,:)=[];
+
+fprintf("Feasible Points i.e. points that also satsify the non-negativity constraints")
+pt
+
+legend('2x1+4x2=8','3x1+5x2=15')
+xlabel('x1')
+ylabel('x2')
+title('Optimization problem')
+
+
+v=pt*C';
+%fprintf("Optimal Value is:"+ max(v));
+
+[obj ind]=max(v);
+ansx1=pt(ind,1)
+ansx2=pt(ind,2)
+
+fprintf("Optimal Value is:"+max(v)+ " at point (" + ansx1 + ","+ ansx2 + ")");
